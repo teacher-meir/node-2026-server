@@ -1,0 +1,22 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "author": "Teacher Meir",
+  "license": "ISC",
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teacher-meir/node-2026-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/teacher-meir/node-2026-server/issues"
+  },
+  "homepage": "https://github.com/teacher-meir/node-2026-server#readme",
+  "description": ""
+}
