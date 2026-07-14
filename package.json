@@ -18,5 +18,8 @@
     "url": "https://github.com/teacher-meir/node-2026-server/issues"
   },
   "homepage": "https://github.com/teacher-meir/node-2026-server#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
 }
