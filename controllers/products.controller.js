@@ -4,7 +4,7 @@ let productsArr = [
     { id: 3, name: 'Keyboard', price: 79.99, description: 'Mechanical keyboard' }
 ];
 
-export const getAllProducts = (req, res) => {
+export const getAllProducts = (req, res, next) => {
     // req.params - פרמטר חובה מזהה משאב - פרמטרים עם סלש
 
     // req.query  - פרמטר אופציונלי - פרמטרים עם סימן שאלה
@@ -25,8 +25,13 @@ export const getAllProducts = (req, res) => {
     // }
 };
 
-export const addProduct = (req, res) => {
-    if (req.body.name) {
+export const addProduct = (req, res, next) => {
+    if (req.body?.name) {
+        console.log('from addProduct');
+        console.log(req.isAdmin ? 'admin' : 'user');
+        console.log((new Date()).getMilliseconds() - req.currentDate1.getMilliseconds());        
+
+
         req.body.id = Math.floor(Math.random() * 100); // באמת יתווסף בדטהבייס אוטומטית
         productsArr.push(req.body);
         res.status(201).json(req.body);
@@ -35,7 +40,7 @@ export const addProduct = (req, res) => {
     }
 };
 
-export const updateProduct = (req, res) => {
+export const updateProduct = (req, res, next) => {
     const { id } = req.params;
 
     // אינדקס של מוצר מתוך המערך
@@ -49,7 +54,7 @@ export const updateProduct = (req, res) => {
     }
 };
 
-export const deleteProduct = (req, res) => {
+export const deleteProduct = (req, res, next) => {
     if (productsArr.some(p => p.id == req.params.idx)) {
         productsArr = productsArr.filter(p => p.id !== +req.params.idx);
         res.status(204).send();
