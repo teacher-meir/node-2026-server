@@ -27,12 +27,27 @@ app.post('/products', (req, res) => {
 });
 
 app.put('/products/:id', (req, res) => {
+    const { id } = req.params;
 
+    // אינדקס של מוצר מתוך המערך
+    const productI = productsArr.findIndex(p => p.id === +id);
+    
+    if (productI === -1) {
+        res.status(404).send('product not found');
+    } else {
+        productsArr[productI] = req.body;
+        res.send('success');
+    }
 });
 
 app.delete('/products/:idx', (req, res) => {
-    productsArr = productsArr.filter(p => p.id != req.params.idx);
-    res.send('success');
+    if (productsArr.some(p => p.id == req.params.idx)) {
+        productsArr = productsArr.filter(p => p.id !== +req.params.idx);
+        res.send('success');
+    } else {
+        // res.statusCode = 404; // node:http
+        res.status(404).send('product not found');
+    }
 });
 
 // 3. הרצת השרת בכתובת מסוימת
