@@ -1,10 +1,15 @@
 import express from 'express';
+import morgan from 'morgan';
+import cors from 'cors';
 import productRouter from './routes/products.router.js';
 import { blockInDay } from './middlewares/simple.middleware.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 
 // 1. יצירת שרת
 const app = express();
+
+// תוספת הרשאה לקליינט ספציפי
+app.use(cors({ origin: 'http://127.0.0.1:5500' }));
 
 // מאפשר לקבל באדי
 app.use(express.json()); // מאפשר לקבל באדי - אוביקט
@@ -13,6 +18,8 @@ app.use(express.urlencoded({ extended: true })); // מאפשר לקבל קבצי
 app.use(blockInDay([3, 7]));
 
 app.use(express.static('public'));
+
+app.use(morgan('dev'));
 
 // 2. מה שקורה כשמגיעים לשרת
 app.get('/', (req, res) => {
