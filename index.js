@@ -6,10 +6,13 @@ import { errorHandler } from './middlewares/error.middleware.js';
 // 1. יצירת שרת
 const app = express();
 
-// מאפשר לקבל באדי - אוביקט
-app.use(express.json());
+// מאפשר לקבל באדי
+app.use(express.json()); // מאפשר לקבל באדי - אוביקט
+app.use(express.urlencoded({ extended: true })); // מאפשר לקבל קבצים - פורמט של טפסים
 
 app.use(blockInDay([3, 7]));
+
+app.use(express.static('public'));
 
 // 2. מה שקורה כשמגיעים לשרת
 app.get('/', (req, res) => {
@@ -23,7 +26,7 @@ app.use('/products',/*blockInDay,*/ productRouter);
 app.use(errorHandler);
 
 // 3. הרצת השרת בכתובת מסוימת
-app.listen(5000, () => {
+app.listen(4000, () => {
     // כשהשרת עולה בפעם הראשונה מגיע לכאן
-    console.log('Server is running on http://localhost:5000');
+    console.log('Server is running on http://localhost:4000');
 });
