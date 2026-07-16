@@ -5,61 +5,85 @@ let productsArr = [
 ];
 
 export const getAllProducts = (req, res, next) => {
-    // req.params - פרמטר חובה מזהה משאב - פרמטרים עם סלש
+    try {
+        // req.params - פרמטר חובה מזהה משאב - פרמטרים עם סלש
 
-    // req.query  - פרמטר אופציונלי - פרמטרים עם סימן שאלה
-    // sort/search/pagintation
+        // req.query  - פרמטר אופציונלי - פרמטרים עם סימן שאלה
+        // sort/search/pagintation
 
-    const { search = '', page } = req.query;
-    // const search = req.query.search;
+        const { search = '', page } = req.query;
 
-    console.log(req.query);
+        console.log(req.query);
 
-    // if (!page) {
-    //     res.status(400).json('חסר עמוד');
-    // }
-    // else {
-    const result = productsArr.filter(p => p.name.includes(search));
+        const result = productsArr.filter(p => p.name.includes(search));
 
-    res.json(result);
-    // }
+        res.json(result);
+    } catch (err) {
+        next({ status: 500, error: err, type: 'server error' });
+    }
 };
 
 export const addProduct = (req, res, next) => {
-    if (req.body?.name) {
+    try {
+        if (!req.body?.name) {
+            return next({
+                status: 409,
+                error: new Error('name is required'),
+                type: 'validation error'
+            });
+        }
+
         console.log('from addProduct');
         console.log(req.isAdmin ? 'admin' : 'user');
-        console.log((new Date()).getMilliseconds() - req.currentDate1.getMilliseconds());        
-
+        // guard in case middleware didn't set req.currentDate1
+        if (req.currentDate1 instanceof Date) {
+            console.log((new Date()).getMilliseconds() - req.currentDate1.getMilliseconds());
+        }
 
         req.body.id = Math.floor(Math.random() * 100); // באמת יתווסף בדטהבייס אוטומטית
         productsArr.push(req.body);
         res.status(201).json(req.body);
-    } else {
-        res.status(409).json({ error: 'name is required' });
+    } catch (err) {
+        next({ status: 500, error: err, type: 'server error' });
     }
 };
 
 export const updateProduct = (req, res, next) => {
-    const { id } = req.params;
+    try {
+        const { id } = req.params;
 
-    // אינדקס של מוצר מתוך המערך
-    const productI = productsArr.findIndex(p => p.id === +id);
+        // אינדקס של מוצר מתוך המערך
+        const productI = productsArr.findIndex(p => p.id === +id);
 
-    if (productI === -1) {
-        res.status(404).json({ error: 'product not found' });
-    } else {
+        if (productI === -1) {
+            return next({
+                error: new Error('product not found'),
+                type: 'resource not found error',
+                status: 404,
+            });
+        }
+
         productsArr[productI] = req.body;
         res.json(productsArr[productI]);
+    } catch (err) {
+        next({ status: 500, error: err, type: 'server error' });
     }
 };
 
 export const deleteProduct = (req, res, next) => {
-    if (productsArr.some(p => p.id == req.params.idx)) {
-        productsArr = productsArr.filter(p => p.id !== +req.params.idx);
-        res.status(204).send();
-    } else {
-        // res.statusCode = 404; // node:http
-        res.status(404).json({ error: 'product not found' });
+    try {
+        const idx = +req.params.idx;
+        if (productsArr.some(p => p.id === idx)) {
+            productsArr = productsArr.filter(p => p.id !== idx);
+            return res.status(204).send();
+        }
+
+        return next({
+            error: new Error('product not found'),
+            type: 'resource not found error',
+            status: 404
+        });
+    } catch (err) {
+        next({ status: 500, error: err, type: 'server error' });
     }
 };

@@ -1,6 +1,7 @@
 import express from 'express';
 import productRouter from './routes/products.router.js';
 import { blockInDay } from './middlewares/simple.middleware.js';
+import { errorHandler } from './middlewares/error.middleware.js';
 
 // 1. יצירת שרת
 const app = express();
@@ -8,7 +9,7 @@ const app = express();
 // מאפשר לקבל באדי - אוביקט
 app.use(express.json());
 
-app.use(blockInDay([5, 7]));
+app.use(blockInDay([3, 7]));
 
 // 2. מה שקורה כשמגיעים לשרת
 app.get('/', (req, res) => {
@@ -17,6 +18,9 @@ app.get('/', (req, res) => {
 
 // use - מתחיל בניתוב הנוכחי
 app.use('/products',/*blockInDay,*/ productRouter);
+
+// נחבר את המידלוואר לכל השרת בסוף הקוד
+app.use(errorHandler);
 
 // 3. הרצת השרת בכתובת מסוימת
 app.listen(5000, () => {
