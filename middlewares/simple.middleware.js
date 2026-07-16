@@ -6,16 +6,25 @@ export const printHello = (req, res, next) => {
     next();
 };
 
-export const blockInDay = (req, res, next) => {
-    const now = new Date();
+// middleware creator - יוצרת מידלוואר לפי פרמטרים
+// פונקציית מעטפת
+export const blockInDay = (days = []) => {// [1, 5, 7]
+    // 1. הגדרת המידלוואר
+    const mdl = (req, res, next) => {
+        // days=[5,7]
+        const now = new Date();
 
-    if (now.getDay() !== 6) {// מתחיל מ-0
-        // next בלי פרמטרים יעביר למידלוואר הבא
-        // כדי לשלוח פרמטר לנקסט נשנה את הבקשה/תגובה
-        req.isAdmin = true;
-        req.currentDate1 = new Date();
-        next();
-    } else {
-        res.status(500).json({ error: 'האתר לא עובד ביום רביעי' })
-    }
+        if (!days.includes(now.getDay() + 1)) {// מתחיל מ-0
+            // next בלי פרמטרים יעביר למידלוואר הבא
+            // כדי לשלוח פרמטר לנקסט נשנה את הבקשה/תגובה
+            req.isAdmin = true;
+            req.currentDate1 = new Date();
+            next();
+        } else {
+            res.status(500).json({ error: `האתר לא עובד ביום ${now.getDay() + 1}` })
+        }
+    };
+
+    // 2. החזרת פונקציית המידלוואר
+    return mdl;
 };

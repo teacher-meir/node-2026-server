@@ -8,7 +8,7 @@ const app = express();
 // מאפשר לקבל באדי - אוביקט
 app.use(express.json());
 
-app.use(blockInDay);
+app.use(blockInDay([5, 7]));
 
 // 2. מה שקורה כשמגיעים לשרת
 app.get('/', (req, res) => {
