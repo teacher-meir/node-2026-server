@@ -19,4 +19,7 @@
 - Finish 3-rd & 4-th stage.
 - There is no need to perform:
     - upload files (section 18) - book update/borrow/return.
-    - section 4.
+
+## Lesson4 - mongodb & mongoose
+- Finish stage five (it is recommended to connect to Mongo Atlas and not to a local DB, but not required).
+- In section 24 - only the *get all* operations (without insert/conditional queries) should be updated
