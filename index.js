@@ -4,9 +4,13 @@ import cors from 'cors';
 import productRouter from './routes/products.router.js';
 import { blockInDay } from './middlewares/simple.middleware.js';
 import { errorHandler } from './middlewares/error.middleware.js';
+import { connectDB } from './config/db.js';
 
 // 1. יצירת שרת
 const app = express();
+
+// התחברות לדטהבייס
+connectDB();
 
 // תוספת הרשאה לקליינט ספציפי
 app.use(cors({ origin: 'http://127.0.0.1:5500' }));

@@ -1,21 +1,21 @@
+import { Product } from "../models/product.model.js";
+
 let productsArr = [
     { id: 1, name: 'Laptop', price: 999.99, description: 'High-performance laptop' },
     { id: 2, name: 'Mouse', price: 29.99, description: 'Wireless mouse' },
     { id: 3, name: 'Keyboard', price: 79.99, description: 'Mechanical keyboard' }
 ];
 
-export const getAllProducts = (req, res, next) => {
+export const getAllProducts = async (req, res, next) => {
     try {
         // req.params - פרמטר חובה מזהה משאב - פרמטרים עם סלש
 
         // req.query  - פרמטר אופציונלי - פרמטרים עם סימן שאלה
         // sort/search/pagintation
 
-        const { search = '', page } = req.query;
+        // const { search = '', page } = req.query;
 
-        console.log(req.query);
-
-        const result = productsArr.filter(p => p.name.includes(search));
+        const result = await Product.find();
 
         res.json(result);
     } catch (err) {
