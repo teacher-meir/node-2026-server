@@ -1,10 +1,11 @@
+import { isValidObjectId } from "mongoose";
 import { Product } from "../models/product.model.js";
 
-let productsArr = [
-    { id: 1, name: 'Laptop', price: 999.99, description: 'High-performance laptop' },
-    { id: 2, name: 'Mouse', price: 29.99, description: 'Wireless mouse' },
-    { id: 3, name: 'Keyboard', price: 79.99, description: 'Mechanical keyboard' }
-];
+// CRUD
+// Create
+// Read
+// Update
+// Delete
 
 export const getAllProducts = async (req, res, next) => {
     try {
@@ -13,9 +14,13 @@ export const getAllProducts = async (req, res, next) => {
         // req.query  - פרמטר אופציונלי - פרמטרים עם סימן שאלה
         // sort/search/pagintation
 
-        // const { search = '', page } = req.query;
+        const { search = '', page = 1, perPage = 5 } = req.query;
 
-        const result = await Product.find();
+        // RegExp - LIKE ביטוי רגולרי, כלומר חיפוש לפי תבנית כמו
+        // i - התעלמות מגודל האות
+        const result = await Product.find({ name: new RegExp(search, 'i')/*, price: { $gt: 100 } */})
+            .skip((page - 1) * perPage)
+            .limit(perPage);
 
         res.json(result);
     } catch (err) {
@@ -23,39 +28,50 @@ export const getAllProducts = async (req, res, next) => {
     }
 };
 
-export const addProduct = (req, res, next) => {
+export const addProduct = async (req, res, next) => {
     try {
-        if (!req.body?.name) {
-            return next({
-                status: 409,
-                error: new Error('name is required'),
-                type: 'validation error'
-            });
-        }
-
-        console.log('from addProduct');
         console.log(req.isAdmin ? 'admin' : 'user');
         // guard in case middleware didn't set req.currentDate1
         if (req.currentDate1 instanceof Date) {
             console.log((new Date()).getMilliseconds() - req.currentDate1.getMilliseconds());
         }
 
-        req.body.id = Math.floor(Math.random() * 100); // באמת יתווסף בדטהבייס אוטומטית
-        productsArr.push(req.body);
-        res.status(201).json(req.body);
+        // תמיד נבצע בדיקות תקינות
+        // 1. JS יצירת אוביקט
+        const newP = new Product(req.body);
+        // 2. DB-שמירת האוביקט ב
+        await newP.save();
+
+        res.status(201).json(newP);
     } catch (err) {
         next({ status: 500, error: err, type: 'server error' });
     }
 };
 
-export const updateProduct = (req, res, next) => {
+export const updateProduct = async (req, res, next) => {
     try {
         const { id } = req.params;
 
-        // אינדקס של מוצר מתוך המערך
-        const productI = productsArr.findIndex(p => p.id === +id);
+        if (!isValidObjectId(id)) {
+            return next({
+                error: new Error('product not found'),
+                type: 'resource not found error',
+                status: 404
+            });
+        }
 
-        if (productI === -1) {
+        const p = await Product.findByIdAndUpdate(
+            id,
+            {
+                $set: req.body, // add/update field
+                $unset: { price: true }, // delete field
+                // $push: { type: ['aaaa'] }, // הוספה לסוף מערך פנימי
+                $addToSet: { type: ['aaaa'] }, // הוספה לסוף מערך פנימי ללא כפולים
+            },
+            { new: true } // החזרת האוביקט לאחר העדכון
+        );
+
+        if (!p) {
             return next({
                 error: new Error('product not found'),
                 type: 'resource not found error',
@@ -63,18 +79,30 @@ export const updateProduct = (req, res, next) => {
             });
         }
 
-        productsArr[productI] = req.body;
-        res.json(productsArr[productI]);
+        // productsArr[productI] = req.body;
+        res.json(p);
     } catch (err) {
         next({ status: 500, error: err, type: 'server error' });
     }
 };
 
-export const deleteProduct = (req, res, next) => {
+export const deleteProduct = async (req, res, next) => {
     try {
-        const idx = +req.params.idx;
-        if (productsArr.some(p => p.id === idx)) {
-            productsArr = productsArr.filter(p => p.id !== idx);
+        const idx = req.params.idx;
+
+        // חובה לבדוק אם האיי-די חוקי
+        // ורק אז להפעיל שאילתות
+        if (!isValidObjectId(idx)) {
+            return next({
+                error: new Error('product not found'),
+                type: 'resource not found error',
+                status: 404
+            });
+        }
+
+        const p = await Product.findByIdAndDelete(idx);
+
+        if (p) {
             return res.status(204).send();
         }
 
