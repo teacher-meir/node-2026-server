@@ -2,6 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import productRouter from './routes/products.router.js';
+import userRouter from './routes/users.router.js';
 import { blockInDay } from './middlewares/simple.middleware.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 import { connectDB } from './config/db.js';
@@ -32,6 +33,7 @@ app.get('/', (req, res) => {
 
 // use - מתחיל בניתוב הנוכחי
 app.use('/products',/*blockInDay,*/ productRouter);
+app.use('/users',userRouter);
 
 // נחבר את המידלוואר לכל השרת בסוף הקוד
 app.use(errorHandler);
