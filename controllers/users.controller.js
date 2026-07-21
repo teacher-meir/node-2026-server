@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt';
 import { User } from '../models/user.model.js';
+import { createToken } from "../services/jwt.service.js";
+import { env } from '../config/env.js';
 
 export const getAllUsers = async (req, res, next) => {
     try {
@@ -17,15 +19,20 @@ export const getAllUsers = async (req, res, next) => {
 export const register = async (req, res, next) => {
     try {
         // הצפנת הסיסמא
-        const hashPassword = await bcrypt.hash(req.body.password, 12);
+        // עדיף לכתוב במידלוואר של מונגוס
+        const hashPassword = await bcrypt.hash(req.body.password, env.BCRYPT_ROUNDS);
+
         // שמירה בדטהבייס
         const user = new User({
             ...req.body, // אמור לעבור ולידציה
             password: hashPassword
         });
         await user.save();
-        
-        res.json(user);
+
+        // יצירת טוקן מוצפן
+        const token = createToken(user);
+
+        res.json({ username: user.name, token });
     } catch (error) {
         next({ status: 500, error: err, type: 'server error' });
     }

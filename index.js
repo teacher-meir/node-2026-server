@@ -6,6 +6,7 @@ import userRouter from './routes/users.router.js';
 import { blockInDay } from './middlewares/simple.middleware.js';
 import { errorHandler } from './middlewares/error.middleware.js';
 import { connectDB } from './config/db.js';
+import { env } from './config/env.js';
 
 // 1. יצירת שרת
 const app = express();
@@ -20,7 +21,7 @@ app.use(cors({ origin: 'http://127.0.0.1:5500' }));
 app.use(express.json()); // מאפשר לקבל באדי - אוביקט
 app.use(express.urlencoded({ extended: true })); // מאפשר לקבל קבצים - פורמט של טפסים
 
-app.use(blockInDay([3, 7]));
+app.use(blockInDay([4, 7]));
 
 app.use(express.static('public'));
 
@@ -39,7 +40,7 @@ app.use('/users',userRouter);
 app.use(errorHandler);
 
 // 3. הרצת השרת בכתובת מסוימת
-app.listen(4000, () => {
+app.listen(env.PORT, () => {
     // כשהשרת עולה בפעם הראשונה מגיע לכאן
     console.log('Server is running on http://localhost:4000');
 });
