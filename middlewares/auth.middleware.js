@@ -10,6 +10,9 @@ import { env } from '../config/env.js';
 export const auth = (req, res, next) => {
     // url, body, headers
     // Bearer ............
+
+
+    
     try {
         const token = req.headers.authorization.split(' ')[1];
         const userData = jwt.verify(token, env.JWT_SECRET_KEY);
