@@ -10,7 +10,7 @@ import { env } from './config/env.js';
 
 // 1. יצירת שרת
 const app = express();
-console.log('teacher meir');
+console.log('teacher meir!!!!!!!!!!!');
 
 // התחברות לדטהבייס
 connectDB();
